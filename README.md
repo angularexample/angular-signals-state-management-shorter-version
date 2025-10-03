@@ -1,6 +1,15 @@
 # AngularSignalState
 
 Example of State Management using pure signals.
+This version compares to:
+
+* [Angular 20 Signals State](https://github.com/angularexample/angular20-signal-state)
+
+The difference is that in this version the store methods, actions, reducers, and effects, are collapsed into a single method. 
+
+Also, the facade service is removed.
+
+This is the simplest version of the Signal State pattern.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.3.
 
