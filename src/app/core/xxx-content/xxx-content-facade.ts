@@ -8,15 +8,15 @@ import { XxxContentStore } from './xxx-content-store';
 export class XxxContentFacade {
   // Store needs to be declared before it is used
   private contentStore: XxxContentStore = inject(XxxContentStore);
-  readonly contentByKey = (key: string): Signal<XxxContentType | undefined> => this.contentStore.selectContentByKey(key);
-  readonly isContentEmpty = (key: string): Signal<boolean> => this.contentStore.selectIsContentEmpty(key);
-  readonly isContentError = (key: string): Signal<boolean> => this.contentStore.selectIsContentError(key);
+  readonly contentByKey = (key: string): Signal<XxxContentType | undefined> => this.contentStore.contentByKey(key);
+  readonly isContentEmpty = (key: string): Signal<boolean> => this.contentStore.isContentEmpty(key);
+  readonly isContentError = (key: string): Signal<boolean> => this.contentStore.isContentError(key);
 
   /**
    * Call this when you render a page that needs content.
    * @param key the key to the content for a given page
    */
   showContent(key: string): void {
-    this.contentStore.showContentAction(key);
+    this.contentStore.showContent(key);
   }
 }
