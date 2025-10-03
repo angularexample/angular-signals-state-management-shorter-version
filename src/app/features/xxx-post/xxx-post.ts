@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
-import { XxxContentType } from '../../core/xxx-content/xxx-content-types';
 import { XxxContent } from '../../core/xxx-content/xxx-content';
-import { XxxContentFacade } from '../../core/xxx-content/xxx-content-facade';
-import { XxxPostType } from './xxx-post-types';
+import { XxxContentStore } from '../../core/xxx-content/xxx-content-store';
+import { XxxContentType } from '../../core/xxx-content/xxx-content-types';
 import { XxxPostFacade } from './xxx-post-facade';
+import { XxxPostType } from './xxx-post-types';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -15,7 +15,7 @@ import { XxxPostFacade } from './xxx-post-facade';
 })
 export class XxxPost {
   protected readonly contentKey: string = 'post';
-  private contentFacade: XxxContentFacade = inject(XxxContentFacade);
+  private contentFacade: XxxContentStore = inject(XxxContentStore);
   protected readonly content: Signal<XxxContentType | undefined> = this.contentFacade.contentByKey(this.contentKey);
   private postFacade: XxxPostFacade = inject(XxxPostFacade);
   protected readonly isNoSelectedUser: Signal<boolean> = this.postFacade.isNoSelectedUser;

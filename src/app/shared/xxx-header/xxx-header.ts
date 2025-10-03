@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { XxxContentFacade } from '../../core/xxx-content/xxx-content-facade';
-import { XxxContentType } from '../../core/xxx-content/xxx-content-types';
 import { XxxContent } from '../../core/xxx-content/xxx-content';
+import { XxxContentStore } from '../../core/xxx-content/xxx-content-store';
+import { XxxContentType } from '../../core/xxx-content/xxx-content-types';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,6 +13,6 @@ import { XxxContent } from '../../core/xxx-content/xxx-content';
 })
 export class XxxHeader {
   protected readonly contentKey: string = 'header';
-  private contentFacade: XxxContentFacade = inject(XxxContentFacade);
-  protected readonly content: Signal<XxxContentType | undefined> = this.contentFacade.contentByKey(this.contentKey);
+  private contentStore: XxxContentStore = inject(XxxContentStore);
+  protected readonly content: Signal<XxxContentType | undefined> = this.contentStore.contentByKey(this.contentKey);
 }

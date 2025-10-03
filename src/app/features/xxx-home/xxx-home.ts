@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
-import { XxxContentType } from '../../core/xxx-content/xxx-content-types';
 import { XxxContent } from '../../core/xxx-content/xxx-content';
-import { XxxContentFacade } from '../../core/xxx-content/xxx-content-facade';
+import { XxxContentStore } from '../../core/xxx-content/xxx-content-store';
+import { XxxContentType } from '../../core/xxx-content/xxx-content-types';
 import { XxxSanitizePipe } from '../../core/xxx-sanitize/xxx-sanitize-pipe';
 
 @Component({
@@ -15,6 +15,6 @@ import { XxxSanitizePipe } from '../../core/xxx-sanitize/xxx-sanitize-pipe';
 })
 export class XxxHome {
   protected readonly contentKey = 'home';
-  private contentFacade: XxxContentFacade = inject(XxxContentFacade);
-  protected readonly content: Signal<XxxContentType | undefined> = this.contentFacade.contentByKey(this.contentKey);
+  private contentStore: XxxContentStore = inject(XxxContentStore);
+  protected readonly content: Signal<XxxContentType | undefined> = this.contentStore.contentByKey(this.contentKey);
 }

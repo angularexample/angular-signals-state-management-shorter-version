@@ -2,11 +2,11 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, Signal } from '
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { XxxContentType } from '../../../core/xxx-content/xxx-content-types';
 import { XxxContent } from '../../../core/xxx-content/xxx-content';
-import { XxxContentFacade } from '../../../core/xxx-content/xxx-content-facade';
-import { XxxPostType } from '../xxx-post-types';
+import { XxxContentStore } from '../../../core/xxx-content/xxx-content-store';
+import { XxxContentType } from '../../../core/xxx-content/xxx-content-types';
 import { XxxPostFacade } from '../xxx-post-facade';
+import { XxxPostType } from '../xxx-post-types';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,9 +25,9 @@ export class XxxPostEdit {
     title: new FormControl('', Validators.required),
     userId: new FormControl(0),
   });
-  private contentFacade: XxxContentFacade = inject(XxxContentFacade);
+  private contentFacade: XxxContentStore = inject(XxxContentStore);
   protected readonly content: Signal<XxxContentType | undefined> = this.contentFacade.contentByKey(this.contentKey);
-  private destroyRef = inject(DestroyRef);
+  private destroyRef: DestroyRef = inject(DestroyRef);
   private postFacade: XxxPostFacade = inject(XxxPostFacade);
   protected readonly isNoSelectedPost: Signal<boolean> = this.postFacade.isNoSelectedPost;
   protected readonly isSaveButtonDisabled: Signal<boolean> = this.postFacade.isSaveButtonDisabled;

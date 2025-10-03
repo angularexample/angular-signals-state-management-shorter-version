@@ -34,6 +34,7 @@ export class XxxContentStore {
   // What used to be effects are here.
 
   private getContent(key: string): void {
+    // Step 1: Update the state to set status to loading
     // Remove any existing content, also replaces the old array for immutability
     const contents: XxxContentType[] = this.contents().filter(item => item.key !== key);
     // Create a new content object
@@ -50,11 +51,16 @@ export class XxxContentStore {
         contents
       })
     );
+    // Step 2: Run the data service to load the content
     let isError = false;
     this.contentService.getContent(key)
       .pipe(
         catchError(() => {
+          // When an error occurs, we want to:
+          // show an error message
+          this.alertService.showError('Error loading content for ' + key);
           isError = true;
+          // Update the state to set status to error
           // Remove any existing content, also replaces the old array for immutability
           const contents: XxxContentType[] = this.contents().filter(item => item.key !== key);
           // Create a new content object
@@ -71,7 +77,6 @@ export class XxxContentStore {
               contents
             })
           );
-          this.alertService.showError('Error loading content for ' + key);
           // return an empty response object
           return of({
             contentModel: {},
@@ -80,6 +85,8 @@ export class XxxContentStore {
         })
       )
       .subscribe((contentApi: XxxContentApi) => {
+        // After either a success or error, we want to:
+        // In the case of a success, update the state to set status to loaded
         if (!isError) {
           // Create a new content object
           const newContent: XxxContentType = {
@@ -144,6 +151,7 @@ export class XxxContentStore {
       return false;
     })
   }
+
 
   private isContentLoaded(key: string): Signal<boolean> {
     return computed(() => {
