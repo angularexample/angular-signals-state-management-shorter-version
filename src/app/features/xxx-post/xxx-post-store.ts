@@ -27,92 +27,12 @@ export class XxxPostStore {
   private postState: WritableSignal<XxxPostState> = signal<XxxPostState>(xxxPostInitialState);
 
   // Actions
-  private getPostsAction(): void {
-    this.getPostsReducer();
-    this.getPostsEffect();
-  }
+  // In this version the actions are all in one method.
+  // The reducer part runs first to update the state.
+  // Then the effect part runs the data service.This is because the actions are all related to the same feature.
+  // After that the success or error reducer part runs.
 
-  private getPostsErrorAction(userId: number): void {
-    this.getPostsErrorReducer();
-    this.getPostsErrorEffect(userId);
-  }
-
-  private getPostsSuccessAction(posts: XxxPostType[]): void {
-    this.getPostsSuccessReducer(posts);
-    this.getPostsSuccessEffect();
-  }
-
-  setPostFormAction(post: XxxPostType): void {
-    this.setPostFormReducer(post);
-  }
-
-  setSelectedPostIdAction(postId: number): void {
-    this.setSelectedPostIdReducer(postId);
-    this.setSelectedPostIdEffect();
-  }
-
-  setSelectedUserIdAction(userId: number): void {
-    this.setSelectedUserIdReducer(userId);
-    this.setSelectedUserIdEffect();
-  }
-
-  showPostsAction(): void {
-    this.showPostsEffect();
-  }
-
-  updatePostAction(): void {
-    this.updatePostEffect();
-  }
-
-  private updatePostErrorAction(postId: number): void {
-    this.updatePostErrorReducer();
-    this.updatePostErrorEffect(postId);
-  }
-
-  private updatePostSuccessAction(post: XxxPostType): void {
-    this.updatePostSuccessReducer(post);
-    this.updatePostSuccessEffect();
-  }
-
-  // Selectors
-  readonly selectIsNoSelectedPost: Signal<boolean> = computed(() => this.postState().selectedPostId === undefined ||
-    !this.postState().isPostsLoading && this.postState().posts.length === 0);
-
-  readonly selectIsPostsEmpty: Signal<boolean> = computed(() => !this.postState().isPostsLoading && this.postState().posts.length === 0);
-
-  readonly selectIsPostsLoaded: Signal<boolean> = computed(() => this.postState().posts.length > 0);
-
-  readonly selectIsPostsLoading: Signal<boolean> = computed(() => this.postState().isPostsLoading);
-
-  readonly selectSelectedPostId: Signal<number | undefined> = computed(() => this.postState().selectedPostId);
-
-  readonly selectSelectedUserId: Signal<number | undefined> = computed(() => this.postState().selectedUserId);
-
-  readonly selectIsNoSelectedUser: Signal<boolean> = computed(() => this.selectSelectedUserId() === undefined);
-
-  private readonly selectPostForm: Signal<XxxPostType | undefined> = computed(() => this.postState().postForm);
-
-  readonly selectPosts: Signal<XxxPostType[]> = computed(() => this.postState().posts);
-
-  readonly selectSelectedPost: Signal<XxxPostType | undefined> = computed(() => {
-    let post: XxxPostType | undefined;
-    const posts: XxxPostType[] = this.selectPosts();
-    const postId: number | undefined = this.selectSelectedPostId();
-    if (postId !== undefined && posts.length > 0) {
-      post = posts.find(item => item.id === postId);
-    }
-    return post;
-  });
-
-  readonly selectIsSaveButtonDisabled: Signal<boolean> = computed(() => {
-    const postForm: XxxPostType | undefined = this.selectPostForm();
-    const selectedPost: XxxPostType | undefined = this.selectSelectedPost();
-    const isPostFormEqual: boolean = isPostsEqual(postForm, selectedPost);
-    return (!this.selectIsPostsLoaded()) || (this.selectSelectedPost() === undefined) || (postForm === undefined) || isPostFormEqual;
-  });
-
-// Reducers
-  private getPostsReducer(): void {
+  private getPosts(): void {
     this.postState.update(state =>
       ({
         ...state,
@@ -120,41 +40,40 @@ export class XxxPostStore {
         Posts: []
       })
     );
-  }
-
-  private getPostsErrorReducer(): void {
-    this.postState.update(state =>
-      ({
-        ...state,
-        isLoading: false
-      })
-    );
-  }
-
-  private getPostsSuccessReducer(posts: XxxPostType[]): void {
-    this.postState.update(state =>
-      ({
-        ...state,
-        isLoading: false,
-        posts
-      })
-    );
-  }
-
-  private setSelectedPostIdReducer(postId: number): void {
-    // make sure the post exists
-    if (this.postState().posts.some(item => item.id === postId)) {
-      this.postState.update(state =>
-        ({
-          ...state,
-          postForm: undefined,
-          selectedPostId: postId
-        })
-      );
+    const userId: number | undefined = this.userFacade.selectedUserId();
+    if (userId === undefined) {
+      return;
     }
+    this.loadingService.loadingOn();
+    let isError = false;
+    this.postDataService.getPosts(userId).pipe(
+      catchError(() => {
+        isError = true;
+        this.postState.update(state =>
+          ({
+            ...state,
+            isLoading: false
+          })
+        );
+        this.alertService.showError('Error loading posts for user: ' + userId);
+        return of([]);
+      })
+    ).subscribe((response: unknown) => {
+      if (!isError) {
+        const posts: XxxPostType[] = response as XxxPostType[];
+        this.postState.update(state =>
+          ({
+            ...state,
+            isLoading: false,
+            posts
+          })
+        );
+     }
+      this.loadingService.loadingOff();
+    })
   }
 
-  private setPostFormReducer(post: XxxPostType): void {
+  setPostForm(post: XxxPostType): void {
     // Create a new object for immutability
     const postForm: XxxPostType = <XxxPostType>JSON.parse(JSON.stringify(post));
     this.postState.update(state =>
@@ -165,7 +84,21 @@ export class XxxPostStore {
     );
   }
 
-  private setSelectedUserIdReducer(userId: number) {
+  setSelectedPostId(postId: number): void {
+    // make sure the post exists
+    if (this.postState().posts.some(item => item.id === postId)) {
+      this.postState.update(state =>
+        ({
+          ...state,
+          postForm: undefined,
+          selectedPostId: postId
+        })
+      );
+    }
+    void this.router.navigateByUrl('/post/edit')
+  }
+
+  setSelectedUserId(userId: number): void {
     // Use signal set instead of update when setting and not updating the state.
     this.postState.set(
       ({
@@ -173,70 +106,7 @@ export class XxxPostStore {
         selectedUserId: userId,
       })
     );
-  }
-
-  private updatePostErrorReducer(): void {
-    this.postState.update(state =>
-      ({
-        ...state,
-        isPostUpdating: false
-      })
-    );
-  }
-
-  private updatePostSuccessReducer(post: XxxPostType): void {
-    this.postState.update(state => {
-        // remove the old post, add the new one, sort by id
-        let posts = state.posts.filter(item => item.id !== post.id);
-        const updatedPost: XxxPostType = {...post};
-        posts.push(updatedPost);
-        posts.sort((a: XxxPostType, b: XxxPostType) => a.id - b.id);
-        return {
-          ...state,
-          isPostUpdating: false,
-          posts
-        };
-      }
-    );
-  }
-
-  // Effects
-  private getPostsEffect(): void {
-    const userId: number | undefined = this.userFacade.selectedUserId();
-    if (userId === undefined) {
-      return;
-    }
-    this.loadingService.loadingOn();
-    let isError = false;
-    this.postDataService.getPosts(userId).pipe(
-      catchError(() => {
-        isError = true;
-        this.getPostsErrorAction(userId);
-        return of([]);
-      })
-    ).subscribe((response: unknown) => {
-      if (!isError) {
-        const posts: XxxPostType[] = response as XxxPostType[];
-        this.getPostsSuccessAction(posts);
-      }
-    })
-  }
-
-  private getPostsErrorEffect(userId: number): void {
-    this.loadingService.loadingOff();
-    this.alertService.showError('Error loading posts for user: ' + userId);
-  }
-
-  private getPostsSuccessEffect(): void {
-    this.loadingService.loadingOff();
-  }
-
-  private setSelectedPostIdEffect(): void {
-    void this.router.navigateByUrl('/post/edit')
-  }
-
-  private setSelectedUserIdEffect() {
-    this.getPostsAction()
+    this.getPosts()
   }
 
   // Logic to show user posts
@@ -245,49 +115,102 @@ export class XxxPostStore {
   //    then set the user id in the Post state to the selected user id
   // 3. If posts are not loaded and the user id in the Post state is the same as the user id,
   //    then get the user posts
-  private showPostsEffect(): void {
+  showPosts(): void {
     const selectedUserId: number | undefined = this.userFacade.selectedUserId();
-    const postSelectedUserId: number | undefined = this.selectSelectedUserId();
+    const postSelectedUserId: number | undefined = this.selectedUserId();
     if (selectedUserId !== undefined) {
       if (selectedUserId !== postSelectedUserId) {
-        this.setSelectedUserIdAction(selectedUserId);
-      } else if (!this.selectIsPostsLoaded()) {
-        this.getPostsAction();
+        this.setSelectedUserId(selectedUserId);
+      } else if (!this.isPostsLoaded()) {
+        this.getPosts();
       }
     }
   }
 
-  private updatePostEffect(): void {
+  updatePost(): void {
     this.loadingService.loadingOn();
-    const post: XxxPostType | undefined = this.selectPostForm();
+    const post: XxxPostType | undefined = this.postForm();
     if (post === undefined) {
       //unexpected error, post should not be undefined
-      this.updatePostErrorAction(0);
+      this.postState.update(state =>
+        ({
+          ...state,
+          isPostUpdating: false
+        })
+      );
+      this.alertService.showError('Error occurred. No selected post.');
       return;
     } else {
       let isError: boolean = false;
       this.postDataService.updatePost(post).pipe(
         catchError(() => {
           isError = true;
-          this.updatePostErrorAction(post.id);
+          this.postState.update(state =>
+            ({
+              ...state,
+              isPostUpdating: false
+            })
+          );
+          this.alertService.showError('Error occurred. Unable to update post: ' + post.id);
           return of({});
         })
       ).subscribe((postResponse: XxxPostType | {}) => {
         if (!isError && Object.keys(postResponse).length > 0) {
-          this.updatePostSuccessAction(postResponse as XxxPostType);
+          this.postState.update(state => {
+              // remove the old post, add the new one, sort by id
+              let posts = state.posts.filter(item => item.id !== post.id);
+              const updatedPost: XxxPostType = {...post};
+              posts.push(updatedPost);
+              posts.sort((a: XxxPostType, b: XxxPostType) => a.id - b.id);
+              return {
+                ...state,
+                isPostUpdating: false,
+                posts
+              };
+            }
+          );
+          this.alertService.showInfo('Successfully updated post ' + post.id);
+          void this.router.navigateByUrl('/post')
         }
+        this.loadingService.loadingOff();
       })
     }
   }
 
-  private updatePostErrorEffect(postId: number): void {
-    this.loadingService.loadingOff();
-    this.alertService.showError('Error occurred. Unable to update post: ' + postId);
-  }
+  // Selectors
+  readonly isNoSelectedPost: Signal<boolean> = computed(() => this.postState().selectedPostId === undefined ||
+    !this.postState().isPostsLoading && this.postState().posts.length === 0);
 
-  private updatePostSuccessEffect(): void {
-    this.loadingService.loadingOff();
-    this.alertService.showInfo('Successfully updated post');
-    void this.router.navigateByUrl('/post')
-  }
+  readonly isPostsEmpty: Signal<boolean> = computed(() => !this.postState().isPostsLoading && this.postState().posts.length === 0);
+
+  readonly isPostsLoaded: Signal<boolean> = computed(() => this.postState().posts.length > 0);
+
+  readonly isPostsLoading: Signal<boolean> = computed(() => this.postState().isPostsLoading);
+
+  readonly selectedPostId: Signal<number | undefined> = computed(() => this.postState().selectedPostId);
+
+  readonly selectedUserId: Signal<number | undefined> = computed(() => this.postState().selectedUserId);
+
+  readonly isNoSelectedUser: Signal<boolean> = computed(() => this.selectedUserId() === undefined);
+
+  private readonly postForm: Signal<XxxPostType | undefined> = computed(() => this.postState().postForm);
+
+  readonly posts: Signal<XxxPostType[]> = computed(() => this.postState().posts);
+
+  readonly selectedPost: Signal<XxxPostType | undefined> = computed(() => {
+    let post: XxxPostType | undefined;
+    const posts: XxxPostType[] = this.posts();
+    const postId: number | undefined = this.selectedPostId();
+    if (postId !== undefined && posts.length > 0) {
+      post = posts.find(item => item.id === postId);
+    }
+    return post;
+  });
+
+  readonly isSaveButtonDisabled: Signal<boolean> = computed(() => {
+    const postForm: XxxPostType | undefined = this.postForm();
+    const selectedPost: XxxPostType | undefined = this.selectedPost();
+    const isPostFormEqual: boolean = isPostsEqual(postForm, selectedPost);
+    return (!this.isPostsLoaded()) || (this.selectedPost() === undefined) || (postForm === undefined) || isPostFormEqual;
+  });
 }

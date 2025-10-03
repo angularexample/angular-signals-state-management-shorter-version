@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/cor
 import { XxxContent } from '../../core/xxx-content/xxx-content';
 import { XxxContentStore } from '../../core/xxx-content/xxx-content-store';
 import { XxxContentType } from '../../core/xxx-content/xxx-content-types';
-import { XxxPostFacade } from './xxx-post-facade';
+import { XxxPostStore } from './xxx-post-store';
 import { XxxPostType } from './xxx-post-types';
 
 @Component({
@@ -15,22 +15,22 @@ import { XxxPostType } from './xxx-post-types';
 })
 export class XxxPost {
   protected readonly contentKey: string = 'post';
-  private contentFacade: XxxContentStore = inject(XxxContentStore);
-  protected readonly content: Signal<XxxContentType | undefined> = this.contentFacade.contentByKey(this.contentKey);
-  private postFacade: XxxPostFacade = inject(XxxPostFacade);
-  protected readonly isNoSelectedUser: Signal<boolean> = this.postFacade.isNoSelectedUser;
-  protected readonly isPostsEmpty: Signal<boolean> = this.postFacade.isPostsEmpty;
-  protected readonly isPostsLoaded: Signal<boolean> = this.postFacade.isPostsLoaded;
-  protected readonly isPostsLoading: Signal<boolean> = this.postFacade.isPostsLoading;
-  protected readonly posts: Signal<XxxPostType[]> = this.postFacade.posts;
-  protected readonly selectedPostId: Signal<number | undefined> = this.postFacade.selectedPostId;
-  protected readonly selectedUserId: Signal<number | undefined> = this.postFacade.selectedUserId;
+  private contentStore: XxxContentStore = inject(XxxContentStore);
+  protected readonly content: Signal<XxxContentType | undefined> = this.contentStore.contentByKey(this.contentKey);
+  private postStore: XxxPostStore = inject(XxxPostStore);
+  protected readonly isNoSelectedUser: Signal<boolean> = this.postStore.isNoSelectedUser;
+  protected readonly isPostsEmpty: Signal<boolean> = this.postStore.isPostsEmpty;
+  protected readonly isPostsLoaded: Signal<boolean> = this.postStore.isPostsLoaded;
+  protected readonly isPostsLoading: Signal<boolean> = this.postStore.isPostsLoading;
+  protected readonly posts: Signal<XxxPostType[]> = this.postStore.posts;
+  protected readonly selectedPostId: Signal<number | undefined> = this.postStore.selectedPostId;
+  protected readonly selectedUserId: Signal<number | undefined> = this.postStore.selectedUserId;
 
   constructor() {
-    this.postFacade.showPosts();
+    this.postStore.showPosts();
   }
 
   protected selectPost(post: XxxPostType): void {
-    this.postFacade.setSelectedPostId(post.id);
+    this.postStore.setSelectedPostId(post.id);
   }
 }

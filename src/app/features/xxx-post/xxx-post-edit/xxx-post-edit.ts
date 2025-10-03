@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { XxxContent } from '../../../core/xxx-content/xxx-content';
 import { XxxContentStore } from '../../../core/xxx-content/xxx-content-store';
 import { XxxContentType } from '../../../core/xxx-content/xxx-content-types';
-import { XxxPostFacade } from '../xxx-post-facade';
+import { XxxPostStore } from '../xxx-post-store';
 import { XxxPostType } from '../xxx-post-types';
 
 @Component({
@@ -25,13 +25,13 @@ export class XxxPostEdit {
     title: new FormControl('', Validators.required),
     userId: new FormControl(0),
   });
-  private contentFacade: XxxContentStore = inject(XxxContentStore);
-  protected readonly content: Signal<XxxContentType | undefined> = this.contentFacade.contentByKey(this.contentKey);
+  private contentStore: XxxContentStore = inject(XxxContentStore);
+  protected readonly content: Signal<XxxContentType | undefined> = this.contentStore.contentByKey(this.contentKey);
   private destroyRef: DestroyRef = inject(DestroyRef);
-  private postFacade: XxxPostFacade = inject(XxxPostFacade);
-  protected readonly isNoSelectedPost: Signal<boolean> = this.postFacade.isNoSelectedPost;
-  protected readonly isSaveButtonDisabled: Signal<boolean> = this.postFacade.isSaveButtonDisabled;
-  protected readonly selectedPost: Signal<XxxPostType | undefined> = this.postFacade.selectedPost;
+  private postStore: XxxPostStore = inject(XxxPostStore);
+  protected readonly isNoSelectedPost: Signal<boolean> = this.postStore.isNoSelectedPost;
+  protected readonly isSaveButtonDisabled: Signal<boolean> = this.postStore.isSaveButtonDisabled;
+  protected readonly selectedPost: Signal<XxxPostType | undefined> = this.postStore.selectedPost;
 
   constructor() {
     this.loadFormData();
@@ -39,7 +39,7 @@ export class XxxPostEdit {
   }
 
   protected onSubmit(): void {
-    this.postFacade.updatePost();
+    this.postStore.updatePost();
   }
 
   private loadFormData(): void {
@@ -62,7 +62,7 @@ export class XxxPostEdit {
       takeUntilDestroyed(this.destroyRef),
     ).subscribe(value => {
       const post: XxxPostType = <XxxPostType>value;
-      this.postFacade.setPostForm(post);
+      this.postStore.setPostForm(post);
     });
   }
 }
