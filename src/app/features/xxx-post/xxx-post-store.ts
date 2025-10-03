@@ -1,12 +1,12 @@
 import { catchError, of } from 'rxjs';
 import { computed, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
+import { isPostsEqual } from "./xxx-post-utilities";
 import { Router } from '@angular/router';
 import { XxxAlert } from '../../core/xxx-alert/xxx-alert';
 import { XxxLoadingService } from '../../core/xxx-loading/xxx-loading-service';
-import { xxxPostInitialState, XxxPostState, XxxPostType } from './xxx-post-types';
 import { XxxPostData } from './xxx-post-data'
-import { XxxUserFacade } from '../xxx-user/xxx-user-facade';
-import { isPostsEqual } from "./xxx-post-utilities";
+import { xxxPostInitialState, XxxPostState, XxxPostType } from './xxx-post-types';
+import { XxxUserStore } from '../xxx-user/xxx-user-store';
 
 /**
  * XxxPostStore is the feature state for the post page.
@@ -21,7 +21,7 @@ export class XxxPostStore {
   private loadingService: XxxLoadingService = inject(XxxLoadingService);
   private postDataService: XxxPostData = inject(XxxPostData);
   private router: Router = inject(Router);
-  private userFacade: XxxUserFacade = inject(XxxUserFacade);
+  private userStore: XxxUserStore = inject(XxxUserStore);
 
   // State
   private postState: WritableSignal<XxxPostState> = signal<XxxPostState>(xxxPostInitialState);
@@ -29,8 +29,8 @@ export class XxxPostStore {
   // Actions
   // In this version the actions are all in one method.
   // The reducer part runs first to update the state.
-  // Then the effect part runs the data service.This is because the actions are all related to the same feature.
-  // After that the success or error reducer part runs.
+  // Then the effect part runs the data service.
+  // After the data service completes, the success or error reducer part runs, followed by the effect part.
 
   private getPosts(): void {
     this.postState.update(state =>
@@ -40,7 +40,7 @@ export class XxxPostStore {
         Posts: []
       })
     );
-    const userId: number | undefined = this.userFacade.selectedUserId();
+    const userId: number | undefined = this.userStore.selectedUserId();
     if (userId === undefined) {
       return;
     }
@@ -116,7 +116,7 @@ export class XxxPostStore {
   // 3. If posts are not loaded and the user id in the Post state is the same as the user id,
   //    then get the user posts
   showPosts(): void {
-    const selectedUserId: number | undefined = this.userFacade.selectedUserId();
+    const selectedUserId: number | undefined = this.userStore.selectedUserId();
     const postSelectedUserId: number | undefined = this.selectedUserId();
     if (selectedUserId !== undefined) {
       if (selectedUserId !== postSelectedUserId) {
@@ -178,6 +178,11 @@ export class XxxPostStore {
   }
 
   // Selectors
+  // A selector is used to read any data from the state.
+  // In a Signal-based state, it is a function that returns a signal.
+  // By design, it is the only way to read the state.
+  // This version does not use the prefix "select" in the name of the selector.
+
   readonly isNoSelectedPost: Signal<boolean> = computed(() => this.postState().selectedPostId === undefined ||
     !this.postState().isPostsLoading && this.postState().posts.length === 0);
 

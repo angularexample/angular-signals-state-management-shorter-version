@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, Signal } from '@angular/core';
-import { XxxContentType } from '../../core/xxx-content/xxx-content-types';
 import { XxxContent } from '../../core/xxx-content/xxx-content';
+import { XxxContentType } from '../../core/xxx-content/xxx-content-types';
 import { XxxContentStore } from '../../core/xxx-content/xxx-content-store';
-import { XxxUserFacade } from './xxx-user-facade';
+import { XxxUserStore } from './xxx-user-store';
 import { XxxUserType } from './xxx-user-types';
 
 @Component({
@@ -17,18 +17,18 @@ export class XxxUser {
   protected readonly contentKey: string = 'user';
   private contentStore: XxxContentStore = inject(XxxContentStore);
   protected readonly content: Signal<XxxContentType | undefined> = this.contentStore.contentByKey(this.contentKey);
-  private userFacade: XxxUserFacade = inject(XxxUserFacade);
-  protected readonly isUsersEmpty: Signal<boolean> = this.userFacade.isUsersEmpty;
-  protected readonly isUsersLoaded: Signal<boolean> = this.userFacade.isUsersLoaded;
-  protected readonly isUsersLoading: Signal<boolean> = this.userFacade.isUsersLoading;
-  protected readonly selectedUserId: Signal<number | undefined> = this.userFacade.selectedUserId;
-  protected readonly users: Signal<XxxUserType[]> = this.userFacade.users;
+  private userStore: XxxUserStore = inject(XxxUserStore);
+  protected readonly isUsersEmpty: Signal<boolean> = this.userStore.isUsersEmpty;
+  protected readonly isUsersLoaded: Signal<boolean> = this.userStore.isUsersLoaded;
+  protected readonly isUsersLoading: Signal<boolean> = this.userStore.isUsersLoading;
+  protected readonly selectedUserId: Signal<number | undefined> = this.userStore.selectedUserId;
+  protected readonly users: Signal<XxxUserType[]> = this.userStore.users;
 
   constructor() {
-    this.userFacade.showUsers();
+    this.userStore.showUsers();
   }
 
   protected rowClick(user: XxxUserType): void {
-    this.userFacade.setSelectedUserId(user.id);
+    this.userStore.setSelectedUserId(user.id);
   }
 }

@@ -26,49 +26,12 @@ export class XxxUserStore {
 
   // Actions
   // An action is what triggers a change in the state or runs an effect.
-  private getUsersAction(): void {
-    this.getUsersReducer();
-    this.getUsersEffect();
-  }
+  // This version uses a single method for all actions.
+  // The reducer part runs first to update the state.
+  // Then the effect part runs the data service.
+  // After the data service completes, the success or error reducer part runs, followed by the effect part.
 
-  private getUsersErrorAction(): void {
-    this.getUsersErrorReducer();
-    this.getUsersErrorEffect();
-  }
-
-  private getUsersSuccessAction(users: XxxUserType[]): void {
-    this.getUsersSuccessReducer(users);
-    this.getUsersSuccessEffect();
-  }
-
-  setSelectedUserIdAction(userId: number): void {
-    this.setSelectUserIdReducer(userId);
-    this.setSelectUserIdEffect();
-  }
-
-  showUsersAction(): void {
-    this.showUsersEffect();
-  }
-
-  // Selectors
-  // A selector is used to read any data from the state.
-  // In a Signal-based state, it is a function that returns a signal.
-  // By design, it is the only way to read the state.
-  readonly selectSelectedUserId: Signal<number | undefined> = computed(() => this.userState().selectedUserId);
-
-  readonly selectUsers: Signal<XxxUserType[]> = computed(() => this.userState().users);
-
-  readonly selectIsUsersLoading: Signal<boolean> = computed(() => this.userState().isUsersLoading);
-
-  readonly selectIsUsersLoaded: Signal<boolean> = computed(() => !this.selectIsUsersLoading() && this.selectUsers().length > 0);
-
-  readonly selectIsUsersEmpty: Signal<boolean> = computed(() => this.selectIsUsersLoaded() && this.selectUsers().length === 0);
-
-  // Reducers
-  // A reducer is a function that takes the current state and an action and returns a new state.
-  // It is used to update the state based on the action.
-  // By design, it is the only way to change the state.
-  private getUsersReducer(): void {
+  private getUsers(): void {
     this.userState.update(state =>
       ({
         ...state,
@@ -76,46 +39,18 @@ export class XxxUserStore {
         users: []
       })
     )
-  }
-
-  private getUsersErrorReducer(): void {
-    this.userState.update(state =>
-      ({
-        ...state,
-        isLoading: false
-      })
-    )
-  }
-
-  private getUsersSuccessReducer(users: XxxUserType[]): void {
-    this.userState.update(state =>
-      ({
-        ...state,
-        isLoading: false,
-        users
-      })
-    )
-  }
-
-  private setSelectUserIdReducer(userId: number): void {
-    this.userState.update(state =>
-      ({
-        ...state,
-        selectedUserId: userId
-      })
-    )
-  }
-
-  // Effects
-  // An effect is where we run a service to access data.
-  // It is also used to navigate to a new page or to display a dialog.
-  private getUsersEffect(): void {
     this.loadingService.loadingOn();
     let isError: boolean = false;
     this.userDataService.getUsers().pipe(
       catchError(() => {
         isError = true;
-        this.getUsersErrorAction();
+        this.userState.update(state =>
+          ({
+            ...state,
+            isLoading: false
+          })
+        )
+        this.alertService.showError('Error loading users');
         const emptyResponse: XxxUserApiResponse = {
           limit: 0,
           skip: 0,
@@ -127,27 +62,45 @@ export class XxxUserStore {
     ).subscribe((response: unknown): void => {
       if (!isError) {
         const apiResponse: XxxUserApiResponse = response as XxxUserApiResponse;
-        this.getUsersSuccessAction(apiResponse.users);
+        this.userState.update(state =>
+          ({
+            ...state,
+            isLoading: false,
+            users: apiResponse.users
+          })
+        )
       }
+      this.loadingService.loadingOff();
     })
   }
 
-  private getUsersErrorEffect(): void {
-    this.loadingService.loadingOff();
-    this.alertService.showError('Error loading users');
-  }
-
-  private getUsersSuccessEffect(): void {
-    this.loadingService.loadingOff();
-  }
-
-  private setSelectUserIdEffect(): void {
+  setSelectedUserId(userId: number): void {
+    this.userState.update(state =>
+      ({
+        ...state,
+        selectedUserId: userId
+      })
+    )
     void this.router.navigateByUrl('/post')
   }
 
-  private showUsersEffect(): void {
-    if (!this.selectIsUsersLoaded()) {
-      this.getUsersAction();
+  showUsers(): void {
+    if (!this.isUsersLoaded()) {
+      this.getUsers();
     }
   }
+
+  // Selectors
+  // A selector is used to read any data from the state.
+  // In a Signal-based state, it is a function that returns a signal.
+  // By design, it is the only way to read the state.
+  readonly selectedUserId: Signal<number | undefined> = computed(() => this.userState().selectedUserId);
+
+  readonly users: Signal<XxxUserType[]> = computed(() => this.userState().users);
+
+  readonly isUsersLoading: Signal<boolean> = computed(() => this.userState().isUsersLoading);
+
+  readonly isUsersLoaded: Signal<boolean> = computed(() => !this.isUsersLoading() && this.users().length > 0);
+
+  readonly isUsersEmpty: Signal<boolean> = computed(() => this.isUsersLoaded() && this.users().length === 0);
 }
