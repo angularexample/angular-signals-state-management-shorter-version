@@ -57,8 +57,6 @@ export class XxxContentStore {
       .pipe(
         catchError(() => {
           // When an error occurs, we want to:
-          // show an error message
-          this.alertService.showError('Error loading content for ' + key);
           isError = true;
           // Update the state to set status to error
           // Remove any existing content, also replaces the old array for immutability
@@ -77,6 +75,8 @@ export class XxxContentStore {
               contents
             })
           );
+          // show an error message
+          this.alertService.showError('Error loading content for ' + key);
           // return an empty response object
           return of({
             contentModel: {},
