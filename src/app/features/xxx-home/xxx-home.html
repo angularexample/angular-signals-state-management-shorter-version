@@ -1,0 +1,9 @@
+<main>
+  <xxx-content [contentKey]="contentKey"></xxx-content>
+  @if (content(); as content) {
+    <section>
+      <h2>{{ content?.contentModel?.pageTitle }}</h2>
+      <div class="xxx-body-content" [innerHTML]="content?.contentModel?.bodyText | xxxSanitize"></div>
+    </section>
+  }
+</main>

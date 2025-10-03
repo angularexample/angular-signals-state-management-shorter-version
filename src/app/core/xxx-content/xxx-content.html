@@ -1,0 +1,6 @@
+@if (isContentError()) {
+  <p>ERROR Unable to load content: {{ contentKey()}}</p>
+}
+@else if (isContentEmpty()) {
+  <p>ERROR Content empty: {{ contentKey()}}</p>
+}

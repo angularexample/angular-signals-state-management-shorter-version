@@ -1,12 +1,16 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { XxxHeader } from './shared/xxx-header/xxx-header';
+import { XxxLoading } from './core/xxx-loading/xxx-loading';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  imports: [
+    RouterOutlet,
+    XxxHeader,
+    XxxLoading
+  ],
+  templateUrl: './app.html'
 })
 export class App {
-  protected readonly title = signal('angular-signal-state');
 }

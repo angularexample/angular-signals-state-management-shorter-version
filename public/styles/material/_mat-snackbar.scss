@@ -1,0 +1,25 @@
+@use '@angular/material' as mat;
+
+:root {
+  @include mat.snack-bar-overrides((
+          button-color: white
+  ));
+}
+
+.xxx-alert-error {
+  @include mat.snack-bar-overrides((
+          container-color: red
+  ));
+}
+
+.xxx-alert-info {
+  @include mat.snack-bar-overrides((
+          container-color: green
+  ));
+}
+
+.xxx-alert-warning {
+  @include mat.snack-bar-overrides((
+          container-color: gold
+  ));
+}

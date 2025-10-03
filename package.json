@@ -1,6 +1,12 @@
 {
   "name": "angular-signal-state",
   "version": "1.0.1",
+  "description": "Angular State Management using Signals Example. Angular 20. No NgRx.",
+  "author": {
+    "name": "JC Lango",
+    "email": "info@angularexample.com"
+  },
+  "license": "MIT",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
