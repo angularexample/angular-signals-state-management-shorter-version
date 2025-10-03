@@ -65,7 +65,7 @@ export class XxxContentStore {
           };
           // Add the new content object
           contents.push(content);
-          // Finally, update the state
+          // Update the state
           this.contentState.update(state => ({
               ...state,
               contents
@@ -91,7 +91,7 @@ export class XxxContentStore {
           const contents: XxxContentType[] = this.contents().filter(item => item.key !== newContent.key);
           // Add the new content object
           contents.push(newContent);
-          // Finally, update the state
+          // Update the state
           this.contentState.update(state => ({
               ...state,
               contents
