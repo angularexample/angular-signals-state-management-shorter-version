@@ -1,7 +1,7 @@
 {
-  "name": "angular-signal-state",
-  "version": "1.0.1",
-  "description": "Angular State Management using Signals Example. Angular 20. No NgRx.",
+  "name": "angular-signals-state-management-shorter-version",
+  "version": "1.0.2",
+  "description": "Angular Signals State Management Example. Shorter version. Angular 20. No NgRx. No SignalStore",
   "author": {
     "name": "JC Lango",
     "email": "info@angularexample.com"
