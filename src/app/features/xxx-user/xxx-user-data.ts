@@ -11,7 +11,7 @@ export class XxxUserData {
 
   getUsers(): Observable<XxxUserApiResponse> {
     // delay added to see the loading component
-    const url = 'https://dummyjson.com/users/?delay=2000'
+    const url = 'https://dummyjson.com/users/?delay=1000'
     return this.http.get<XxxUserApiResponse>(url);
   }
 }
