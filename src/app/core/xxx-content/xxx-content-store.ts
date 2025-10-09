@@ -76,7 +76,7 @@ export class XxxContentStore {
             })
           );
           // show an error message
-          this.alertService.showError('Error loading content for ' + key);
+          this.alertService.showError(`Error. Unable to get content for: ${key}`);
           // return an empty response object
           return of({
             contentModel: {},
