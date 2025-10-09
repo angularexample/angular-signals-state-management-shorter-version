@@ -50,7 +50,7 @@ export class XxxUserStore {
             isLoading: false
           })
         )
-        this.alertService.showError('Error loading users');
+        this.alertService.showError('Error. Unable to get users');
         const emptyResponse: XxxUserApiResponse = {
           limit: 0,
           skip: 0,
@@ -102,5 +102,5 @@ export class XxxUserStore {
 
   readonly isUsersLoaded: Signal<boolean> = computed(() => !this.isUsersLoading() && this.users().length > 0);
 
-  readonly isUsersEmpty: Signal<boolean> = computed(() => this.isUsersLoaded() && this.users().length === 0);
+  readonly isUsersEmpty: Signal<boolean> = computed(() => !this.isUsersLoading() && this.users().length === 0);
 }
