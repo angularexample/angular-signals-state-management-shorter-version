@@ -33,17 +33,17 @@ export class XxxPostStore {
   // After the data service completes, the success or error reducer part runs, followed by the effect part.
 
   private getPosts(): void {
-    this.postState.update(state =>
-      ({
-        ...state,
-        isLoading: true,
-        Posts: []
-      })
-    );
     const userId: number | undefined = this.selectedUserId();
     if (userId === undefined) {
       return;
     }
+    this.postState.update(state =>
+      ({
+        ...state,
+        isPostsLoading: true,
+        Posts: []
+      })
+    );
     this.loadingService.loadingOn();
     let isError = false;
     this.postDataService.getPosts(userId).pipe(
@@ -52,7 +52,7 @@ export class XxxPostStore {
         this.postState.update(state =>
           ({
             ...state,
-            isLoading: false
+            isPostsLoading: false
           })
         );
         this.alertService.showError(`Error. Unable to get posts for user: ${userId}`);
@@ -64,7 +64,7 @@ export class XxxPostStore {
         this.postState.update(state =>
           ({
             ...state,
-            isLoading: false,
+            isPostsLoading: false,
             posts
           })
         );
