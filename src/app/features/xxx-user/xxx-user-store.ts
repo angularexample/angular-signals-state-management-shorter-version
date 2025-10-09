@@ -35,7 +35,7 @@ export class XxxUserStore {
     this.userState.update(state =>
       ({
         ...state,
-        isLoading: true,
+        isUsersLoading: true,
         users: []
       })
     )
@@ -47,7 +47,7 @@ export class XxxUserStore {
         this.userState.update(state =>
           ({
             ...state,
-            isLoading: false
+            isUsersLoading: false
           })
         )
         this.alertService.showError('Error. Unable to get users');
@@ -65,7 +65,7 @@ export class XxxUserStore {
         this.userState.update(state =>
           ({
             ...state,
-            isLoading: false,
+            isUsersLoading: false,
             users: apiResponse.users
           })
         )
