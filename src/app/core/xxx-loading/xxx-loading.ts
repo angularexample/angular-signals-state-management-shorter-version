@@ -37,17 +37,16 @@ import { XxxLoadingService } from './xxx-loading-service';
  * The loading indicator will be shown only the first time the route uses lazy loading.
  *
  * To use the http interceptor, add this to the app module providers
- *    {
- *       provide: HTTP_INTERCEPTORS,
- *       useClass: XxxLoadingInterceptor,
- *       multi: true,
+ *   {
+ *     provide: HTTP_INTERCEPTORS,
+ *     useClass: XxxLoadingInterceptor,
+ *     multi: true,
  *   }
  *
- *   To turn off loading for certain http requests, set the context as in this example
+ * To turn off loading for certain http requests, set the context as in this example
  *   this.http.get('/api/courses', {
- *     context: new HttpContext().set(SkipLoading, true)
+ *     context: new HttpContext().set(SKIP_LOADING, true)
  *   });
- *
  */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
