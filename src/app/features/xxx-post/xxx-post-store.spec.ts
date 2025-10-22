@@ -1,4 +1,4 @@
-import { Component, Signal } from '@angular/core';
+import { Component, signal, Signal, WritableSignal } from '@angular/core';
 import { mockPost, mockPost1, mockPost2, mockPosts } from './xxx-post.mocks';
 import { of, throwError } from 'rxjs';
 import { provideHttpClient } from '@angular/common/http';
@@ -22,7 +22,7 @@ describe('XxxPostStore', () => {
   let router: Router;
   let spyRouterNavigate: jest.SpyInstance;
   let store: any;
-  const userId = mockPost.userId;
+  const userId: number = mockPost.userId;
 
   const mockRoutes: Route[] = [
     {
@@ -31,13 +31,13 @@ describe('XxxPostStore', () => {
     },
   ];
 
-  const mockXxxAlert = {
+  const mockXxxAlert: Partial<XxxAlert> = {
     showError: jest.fn(),
     showInfo: jest.fn(),
     showWarning: jest.fn(),
   }
 
-  const mockXxxLoadingService = {
+  const mockXxxLoadingService: Partial<XxxLoadingService> = {
     loadingOff: jest.fn(),
     loadingOn: jest.fn(),
   }
@@ -48,7 +48,7 @@ describe('XxxPostStore', () => {
   }
 
   const mockXxxUserStore = {
-    selectedUserId: jest.fn(),
+    selectedUserId: <WritableSignal<number | undefined>> signal(userId)
   }
 
   beforeEach(() => {
@@ -68,7 +68,7 @@ describe('XxxPostStore', () => {
     spyRouterNavigate = jest.spyOn(router, 'navigateByUrl');
     mockXxxPostData.getPosts.mockReturnValue(of(mockPosts));
     mockXxxPostData.updatePost.mockReturnValue(of(mockPost));
-    mockXxxUserStore.selectedUserId.mockReturnValue(userId);
+    mockXxxUserStore.selectedUserId = signal(userId);
   });
 
   afterEach(() => {
