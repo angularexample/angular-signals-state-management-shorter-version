@@ -20,7 +20,7 @@ describe('XxxUserStore', () => {
   const mockUserId = 1;
   let router: Router;
   let spyRouterNavigate: jest.SpyInstance;
-  let store: any;
+  let store: XxxUserStore;
 
   const mockRoutes: Route[] = [
     {
@@ -29,13 +29,13 @@ describe('XxxUserStore', () => {
     },
   ];
 
-  const mockXxxAlert = {
+  const mockXxxAlert: Partial<XxxAlert> = {
     showError: jest.fn(),
     showInfo: jest.fn(),
     showWarning: jest.fn(),
   }
 
-  const mockXxxLoadingService = {
+  const mockXxxLoadingService: Partial<XxxLoadingService> = {
     loadingOff: jest.fn(),
     loadingOn: jest.fn(),
   }
