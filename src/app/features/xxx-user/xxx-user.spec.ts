@@ -32,13 +32,13 @@ describe('XxxUser', () => {
   }
 
   const mockXxxUserStore = {
-    isUsersEmpty: jest.fn().mockReturnValue(signal(false)),
-    isUsersLoaded: jest.fn().mockReturnValue(signal(false)),
-    isUsersLoading: jest.fn().mockReturnValue(signal(false)),
-    selectedUserId: jest.fn().mockReturnValue(signal(mockUserId)),
+    isUsersEmpty: signal(false),
+    isUsersLoaded: signal(false),
+    isUsersLoading: signal(false),
+    selectedUserId: signal(mockUserId),
     setSelectedUserId: jest.fn(),
     showUsers: jest.fn(),
-    users: jest.fn().mockReturnValue(signal(mockUsers)),
+    users: signal(mockUsers),
   }
 
   beforeEach(async () => {
