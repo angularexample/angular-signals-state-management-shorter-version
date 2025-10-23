@@ -16,8 +16,8 @@ class HostComponent {
 }
 
 describe('XxxContent', () => {
-  let hostFixture: ComponentFixture<HostComponent>;
   let contentComponent: XxxContent;
+  let hostFixture: ComponentFixture<HostComponent>;
 
   const mockXxxContentStore = {
     contentByKey: jest.fn().mockReturnValue(signal(mockContentHome)),
@@ -50,6 +50,7 @@ describe('XxxContent', () => {
 
   describe('OnInit', () => {
     it('should have input value', async () => {
+      // To test a zoneless component that has inputs, use whenStable()
       await hostFixture.whenStable();
       expect(contentComponent.contentKey()).toBe(mockContentKey);
     });
