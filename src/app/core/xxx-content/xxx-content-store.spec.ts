@@ -16,7 +16,7 @@ describe('XxxContentStore', () => {
     getContent: jest.fn()
   }
 
-  const mockXxxAlert = {
+  const mockXxxAlert: Partial<XxxAlert> = {
     showError: jest.fn(),
     showInfo: jest.fn(),
     showWarning: jest.fn(),
@@ -37,8 +37,7 @@ describe('XxxContentStore', () => {
   });
 
   afterEach(() => {
-    mockXxxAlert.showError.mockClear();
-    mockXxxContentData.getContent.mockClear();
+    jest.clearAllMocks();
   })
 
   describe('constructor phase', () => {
