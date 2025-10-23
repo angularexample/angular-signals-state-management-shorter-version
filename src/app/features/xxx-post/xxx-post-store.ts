@@ -33,10 +33,7 @@ export class XxxPostStore {
   // After the data service completes, the success or error reducer part runs, followed by the effect part.
 
   private getPosts(): void {
-    const userId: number | undefined = this.selectedUserId();
-    if (userId === undefined) {
-      return;
-    }
+    const userId: number | undefined = this.selectedUserId() || 0;
     this.postState.update(state =>
       ({
         ...state,
