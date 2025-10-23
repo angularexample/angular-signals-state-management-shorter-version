@@ -4,7 +4,7 @@ import { mockContentHome } from './xxx-content.mocks';
 import { XxxContent } from './xxx-content';
 import { XxxContentStore } from './xxx-content-store';
 
-const mockContentKey = 'content-key';
+const mockContentKey: string = 'content-key';
 
 // To test the input, use a mock host component.
 @Component({
@@ -12,7 +12,7 @@ const mockContentKey = 'content-key';
   template: '<xxx-content [contentKey]="contentKey"></xxx-content>'
 })
 class HostComponent {
-  contentKey = mockContentKey;
+  contentKey: string = mockContentKey;
 }
 
 describe('XxxContent', () => {
@@ -37,6 +37,10 @@ describe('XxxContent', () => {
     // Get the instance of the component under test as a child of the host component.
     contentComponent = hostFixture.debugElement.children[0].componentInstance;
   });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  })
 
   describe('constructor phase', () => {
     it('should be created', () => {
